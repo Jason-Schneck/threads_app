@@ -2,13 +2,14 @@
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { Button } from "@/components/ui/button"
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePathname, useRouter } from 'next/navigation'
 // import { updateUser } from '@/lib/actions/user.actions'
 import { ThreadValidation } from '@/lib/validations/thread';
 import { createThread } from '@/lib/actions/thread.actions'
+import { useOrganization } from '@clerk/nextjs'
 
 interface Props {
     user: {
@@ -26,6 +27,7 @@ interface Props {
 function PostThread({ userId }: { userId: string }) {
     const router = useRouter();
     const pathname = usePathname();
+    const { organization } = useOrganization();
 
 
     const form = useForm({
@@ -40,10 +42,9 @@ function PostThread({ userId }: { userId: string }) {
         await createThread({
             text: values.thread,
             author: userId,
-            communityId: null,
+            communityId: organization ? organization.id : null,
             path: pathname
         });
-
         router.push("/")
     }
 
